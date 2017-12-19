@@ -93,6 +93,9 @@ Handlebars.registerHelper('ns', R.compose(
   R.props(['owner', 'libName', 'patchName'])
 ));
 
+// Debug helper
+Handlebars.registerHelper('json', JSON.stringify);
+
 // Returns declaration type specifier for an initial value of an output
 Handlebars.registerHelper('decltype', (type, value) => (
   (type === PIN_TYPE.STRING && value !== '')
@@ -130,6 +133,45 @@ Handlebars.registerHelper('cppValue', (type, value) =>
     [PIN_TYPE.NUMBER]: R.toString,
     [PIN_TYPE.STRING]: cppStringLiteral,
   })(value)
+);
+
+Handlebars.registerHelper('eachDeferNode', function eachDeferNode(options) {
+  return this.nodes
+    .filter(R.path(['patch', 'isDefer']))
+    .map(node => options.fn(node))
+    .join('\n');
+});
+
+Handlebars.registerHelper('eachNonConstantNode', function eachNonConstantNode(options) {
+  return R.compose(
+    R.join(''),
+    R.map(node => options.fn(node)),
+    R.reject(R.path(['patch', 'isConstant']))
+  )(this.nodes);
+});
+
+Handlebars.registerHelper('eachNodeUsingTimeouts', function eachNodeUsingTimeouts(options) {
+  return R.compose(
+    R.join(''),
+    R.map(node => options.fn(node)),
+    R.filter(R.path(['patch', 'usesTimeouts']))
+  )(this.nodes);
+});
+
+Handlebars.registerHelper('eachLinkedInput', function eachLinkedInput(options) {
+  return R.compose(
+    R.join(''),
+    R.map(node => options.fn(node)),
+    R.filter(R.has('nodeId'))
+  )(this.inputs);
+});
+
+Handlebars.registerHelper('eachDirtyable', (pins, block) =>
+  R.compose(
+    R.join(''),
+    R.map(pin => block.fn(pin)),
+    R.filter(R.prop('isDirtyable'))
+  )(pins)
 );
 
 // =============================================================================

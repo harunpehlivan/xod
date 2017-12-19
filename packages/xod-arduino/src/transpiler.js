@@ -122,6 +122,18 @@ const createTConfig = def(
   })(project)
 );
 
+// Checks for `#pragma XOD use setTimeout` directive in source
+const usesTimeouts = def(
+  'usesTimeouts :: String -> Boolean',
+  R.test(/#\s*pragma\s+XOD\s+use\s+setTimeout\s*(\/(\/|\*).*)?$/m)
+);
+
+// Checks for `#pragma XOD disable dirty values` directive in source
+const areDirtyValuesDisabled = def(
+  'usesTimeouts :: String -> Boolean',
+  R.test(/#\s*pragma\s+XOD\s+disable\s+dirty\s+values\s*(\/(\/|\*).*)?$/m)
+);
+
 const createTPatches = def(
   'createTPatches :: PatchPath -> Project -> [TPatch]',
   (entryPath, project) => R.compose(
@@ -133,6 +145,11 @@ const createTPatches = def(
         Project.getImpl(patch)
       );
 
+      const dirtyValuesEnabled = !areDirtyValuesDisabled(impl);
+      const isDirtyable = pin =>
+        dirtyValuesEnabled ||
+          Project.getPinType(pin) === Project.PIN_TYPE.PULSE;
+
       const outputs = R.compose(
         R.map(R.applySpec({
           type: Project.getPinType,
@@ -141,26 +158,42 @@ const createTPatches = def(
             Project.defaultValueOfType,
             Project.getPinType
           ),
+          isDirtyable,
+          isDirtyOnBoot: R.compose(
+            R.not,
+            R.equals(Project.PIN_TYPE.PULSE),
+            Project.getPinType
+          ),
         })),
         Project.normalizePinLabels,
         Project.listOutputPins
       )(patch);
+
       const inputs = R.compose(
         R.map(R.applySpec({
           type: Project.getPinType,
           pinKey: Project.getPinLabel,
+          isDirtyable,
         })),
         Project.normalizePinLabels,
         Project.listInputPins
       )(patch);
 
-      return R.merge(names,
+      const isThisIsThat = {
+        isDefer: Project.isDeferNodeType(path),
+        isConstant: Project.isConstantNodeType(path),
+        usesTimeouts: usesTimeouts(impl),
+      };
+
+      return R.mergeAll([
+        names,
+        isThisIsThat,
         {
           outputs,
           inputs,
           impl,
         }
-      );
+      ]);
     }),
     R.omit([entryPath]),
     R.indexBy(Project.getPatchPath),

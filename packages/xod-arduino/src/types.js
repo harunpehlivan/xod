@@ -44,16 +44,23 @@ const TPatchOutput = Model('TPatchOutput', {
   type: $.String,
   pinKey: $.String,
   value: DataValue,
+  isDirtyable: $.Boolean,
+  isDirtyOnBoot: $.Boolean,
 });
 
 const TPatchInput = Model('TPatchInput', {
+  type: $.String,
   pinKey: $.String,
+  isDirtyable: $.Boolean,
 });
 
 export const TPatch = Model('TPatch', {
   owner: $.String,
   libName: $.String,
   patchName: $.String,
+  isDefer: $.Boolean,
+  isConstant: $.Boolean,
+  usesTimeouts: $.Boolean,
   outputs: $.Array(TPatchOutput),
   inputs: $.Array(TPatchInput),
   impl: $.String,
@@ -78,7 +85,7 @@ export const TNode = Model('TNode', {
   patch: TPatch,
   outputs: $.Array(TNodeOutput),
   inputs: $.Array(TNodeInput),
-  dirtyFlags: $.Number,
+  dirtyFlags: $.Number, // TODO: remove
 });
 
 export const TProject = Model('TProject', {

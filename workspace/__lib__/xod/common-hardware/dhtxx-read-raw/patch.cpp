@@ -1,4 +1,6 @@
 
+#pragma XOD use setTimeout
+
 struct State {
     bool reading;
 };

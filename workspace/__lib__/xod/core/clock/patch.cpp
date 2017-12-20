@@ -1,3 +1,6 @@
+
+#pragma XOD use setTimeout
+
 struct State {
   TimeMs nextTrig;
 };

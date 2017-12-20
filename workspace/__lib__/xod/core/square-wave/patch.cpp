@@ -1,3 +1,6 @@
+
+#pragma XOD use setTimeout
+
 struct State {
     bool wasEnabled;
     TimeMs timeToSwitch;

@@ -7,7 +7,9 @@
     "build": "babel src -d dist",
     "dev": "yarn run build --watch",
     "test": "mocha test/**/*.spec.js",
-    "test-func": "mocha --opts test-func/mocha.opts test-func/**/*.spec.js"
+    "test-func": "mocha --opts test-func/mocha.opts test-func/**/*.spec.js",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -24,9 +26,11 @@
     "ramda-fantasy": "^0.8.0",
     "swagger-client": "^3.4.3",
     "xod-func-tools": "^0.17.0",
-    "xod-project": "^0.17.0"
+    "xod-project": "^0.17.0",
+    "snyk": "^1.189.0"
   },
   "devDependencies": {
     "chai": "^4.1.2"
-  }
+  },
+  "snyk": true
 }

@@ -14,7 +14,9 @@
     "start": "electron .",
     "postinstall": "electron-builder install-app-deps",
     "test": "electron-mocha ./test",
-    "test-func": "mocha --opts test-func/mocha.opts test-func/**/*.spec.js"
+    "test-func": "mocha --opts test-func/mocha.opts test-func/**/*.spec.js",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "dependencies": {
     "babel-polyfill": "^6.16.0",
@@ -44,7 +46,8 @@
     "xod-deploy": "^0.17.0",
     "xod-fs": "^0.17.0",
     "xod-func-tools": "^0.17.0",
-    "xod-project": "^0.17.0"
+    "xod-project": "^0.17.0",
+    "snyk": "^1.316.1"
   },
   "devDependencies": {
     "babel-cli": "^6.16.0",
@@ -96,5 +99,6 @@
         "channel": "latest"
       }
     ]
-  }
+  },
+  "snyk": true
 }
